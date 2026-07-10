@@ -28,10 +28,13 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
+ARG APP_VERSION
+
 COPY --from=builder \
      /build/target/*.jar \
      app.jar
 
+LABEL org.opencontainers.image.version=$APP_VERSION
 
 EXPOSE 8080
 
