@@ -1,0 +1,36 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/ubisum/persona-rest
+  tag: "0.0.1"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: ghcr-secret
+
+service:
+  type: ClusterIP
+  port: 8080
+
+container:
+  port: 8080
+
+config:
+  springProfile: k8s
+
+database:
+  host: mysql
+  port: 3306
+  name: persona
+
+secret:
+  username: root
+  password: admin
+
+resources: {}
+
+ingress:
+  enabled: false
+
+autoscaling:
+  enabled: false

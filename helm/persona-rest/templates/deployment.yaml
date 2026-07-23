@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+  name: {{ include "persona-rest.fullname" . }}
+
+  labels:
+    {{- include "persona-rest.labels" . | nindent 4 }}
+
+
+spec:
+
+  replicas: {{ .Values.replicaCount }}
+
+
+  selector:
+
+    matchLabels:
+      {{- include "persona-rest.selectorLabels" . | nindent 6 }}
+
+
+  template:
+
+    metadata:
+
+      labels:
+        {{- include "persona-rest.selectorLabels" . | nindent 8 }}
+
+
+    spec:
+
+      imagePullSecrets:
+
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+
+
+      containers:
+
+        - name: {{ .Chart.Name }}
+
+
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+
+
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+
+          ports:
+
+            - name: http
+              containerPort: {{ .Values.container.port }}
+              protocol: TCP
+
+
+          env:
+
+
+            - name: SPRING_PROFILES_ACTIVE
+
+              valueFrom:
+
+                configMapKeyRef:
+
+                  name: {{ include "persona-rest.fullname" . }}-config
+
+                  key: SPRING_PROFILES_ACTIVE
+
+
+
+            - name: SPRING_DATASOURCE_URL
+
+              value: {{ include "persona-rest.jdbcUrl" . | quote }}
+
+
+
+            - name: SPRING_DATASOURCE_USERNAME
+
+              valueFrom:
+
+                secretKeyRef:
+
+                  name: {{ include "persona-rest.fullname" . }}
+
+                  key: username
+
+
+
+            - name: SPRING_DATASOURCE_PASSWORD
+
+              valueFrom:
+
+                secretKeyRef:
+
+                  name: {{ include "persona-rest.fullname" . }}
+
+                  key: password
+
+
+
+          resources:
+
+            {{- toYaml .Values.resources | nindent 12 }}
